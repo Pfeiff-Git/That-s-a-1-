@@ -5,7 +5,7 @@ import { getTheme, getToneLabel, getFlavorIntro, getFumbleEmojis } from '../util
 import { FumbleResult } from '../types';
 
 export default function FumbleApp() {
-  const [setting, setSetting] = useState<string>("High Fantasy");
+  const [setting, setSetting] = useState<string>(campaignSettings[0]);
   const [system, setSystem] = useState<string>("dnd5e");
   const [tone, setTone] = useState<number>(50);
   const [attackType, setAttackType] = useState<string>("Melee");
@@ -127,7 +127,7 @@ export default function FumbleApp() {
   };
 
   return (
-    <div className={`min-h-screen ${theme.bg} transition-colors duration-500 flex flex-col items-center p-4 sm:p-8 relative overflow-hidden`} style={theme.bgStyle}>
+    <div className={`min-h-screen ${theme.bg} transition-colors duration-500 flex flex-col items-center p-4 sm:p-8 relative overflow-x-hidden`} style={theme.bgStyle}>
       
       <style>{`
         @keyframes shake {
@@ -159,7 +159,7 @@ export default function FumbleApp() {
       {/* Header */}
       <div className="relative z-10 w-full max-w-2xl mb-8 flex flex-col items-center text-center space-y-2 mt-8">
         <h1 
-            className={`${theme.textMain} text-2xl sm:text-4xl uppercase tracking-wider drop-shadow-md`}
+            className={`${theme.textMain} text-base sm:text-4xl uppercase tracking-wider drop-shadow-md whitespace-nowrap`}
             style={{ fontFamily: theme.fontHeader }}
         >
         "{titleText}"
@@ -178,15 +178,15 @@ export default function FumbleApp() {
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                  {/* Setting Select (MOVED FIRST) */}
                 <div className="space-y-2">
-                    <label className={`${theme.textMuted} text-sm uppercase tracking-wider block`} style={{ fontFamily: theme.fontHeader }}>
+                    <label className={`${theme.textMuted} text-xs sm:text-sm uppercase tracking-wider block`} style={{ fontFamily: theme.fontHeader }}>
                         Flavor / Setting
                     </label>
                     <div className="relative">
                         <select 
                             value={setting}
                             onChange={(e) => setSetting(e.target.value)}
-                            className={`w-full ${theme.input} appearance-none rounded-none p-3 outline-none cursor-pointer`}
-                            style={{ fontFamily: theme.fontBody, fontSize: '1.2rem' }}
+                            className={`w-full ${theme.input} appearance-none rounded-none p-3 outline-none cursor-pointer text-lg`}
+                            style={{ fontFamily: theme.fontBody }}
                         >
                             {campaignSettings.map((s) => (
                                 <option key={s} value={s}>{s}</option>
@@ -200,15 +200,15 @@ export default function FumbleApp() {
 
                  {/* System Select (MOVED SECOND) */}
                  <div className="space-y-2">
-                    <label className={`${theme.textMuted} text-sm uppercase tracking-wider block`} style={{ fontFamily: theme.fontHeader }}>
+                    <label className={`${theme.textMuted} text-xs sm:text-sm uppercase tracking-wider block`} style={{ fontFamily: theme.fontHeader }}>
                         Ruleset
                     </label>
                     <div className="relative">
                         <select 
                             value={system}
                             onChange={(e) => setSystem(e.target.value)}
-                            className={`w-full ${theme.input} appearance-none rounded-none p-3 outline-none cursor-pointer`}
-                            style={{ fontFamily: theme.fontBody, fontSize: '1.2rem' }}
+                            className={`w-full ${theme.input} appearance-none rounded-none p-3 outline-none cursor-pointer text-lg`}
+                            style={{ fontFamily: theme.fontBody }}
                         >
                             {gameSystems.map((s) => (
                                 <option key={s.id} value={s.id}>{s.label}</option>
@@ -225,15 +225,15 @@ export default function FumbleApp() {
 
             {/* Row 2: Action Type */}
             <div className="space-y-2 mb-8">
-                <label className={`${theme.textMuted} text-sm uppercase tracking-wider block`} style={{ fontFamily: theme.fontHeader }}>
+                <label className={`${theme.textMuted} text-xs sm:text-sm uppercase tracking-wider block`} style={{ fontFamily: theme.fontHeader }}>
                     Action Type
                 </label>
                 <div className="relative">
                     <select 
                         value={attackType}
                         onChange={(e) => setAttackType(e.target.value)}
-                        className={`w-full ${theme.input} appearance-none rounded-none p-3 outline-none cursor-pointer`}
-                        style={{ fontFamily: theme.fontBody, fontSize: '1.2rem' }}
+                        className={`w-full ${theme.input} appearance-none rounded-none p-3 outline-none cursor-pointer text-lg`}
+                        style={{ fontFamily: theme.fontBody }}
                     >
                         <option value="Melee">Melee Attack</option>
                         <option value="Ranged">Ranged Attack</option>
@@ -253,9 +253,14 @@ export default function FumbleApp() {
 
             {/* Row 3: Tone Slider */}
             <div className="space-y-4 mb-10">
-                <div className="flex justify-between items-end">
-                    <label className={`${theme.textMuted} text-sm uppercase tracking-wider`} style={{ fontFamily: theme.fontHeader }}>Chaos Level</label>
-                    <div className={`flex items-center gap-2 text-lg ${toneLabel.color}`} style={{ fontFamily: theme.fontBody }}>
+                <div className="flex justify-between items-end gap-2 sm:gap-4">
+                    <label className={`${theme.textMuted} text-xs sm:text-xs uppercase tracking-wider whitespace-nowrap flex-shrink-0`} style={{ fontFamily: theme.fontHeader }}>
+                        Chaos Level <span className="text-[0.7em] opacity-70 normal-case align-middle ml-0.5 sm:ml-1">(Slide)</span>
+                    </label>
+                    <div 
+                        className={`flex items-center justify-end gap-2 text-base sm:text-lg min-w-[6rem] whitespace-nowrap transition-colors duration-300`} 
+                        style={{ fontFamily: theme.fontBody, ...toneLabel.style }}
+                    >
                         {toneLabel.label}
                     </div>
                 </div>
@@ -285,8 +290,11 @@ export default function FumbleApp() {
                         className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 pointer-events-none z-10 flex items-center justify-center transition-all duration-75"
                         style={{ left: `${tone}%` }}
                     >
-                        {/* Scaled Icon with Drop Shadow */}
-                        <div className={`transform scale-[2.5] ${toneLabel.color} drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]`}>
+                        {/* Scaled Icon with Drop Shadow and Fluid Color */}
+                        <div 
+                            className={`transform scale-[2.0] sm:scale-[2.5] drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] transition-colors duration-100`}
+                            style={toneLabel.style}
+                        >
                             {toneLabel.icon}
                         </div>
                     </div>
@@ -296,12 +304,15 @@ export default function FumbleApp() {
             {/* Action Button */}
             <button 
                 onClick={generateFumble}
-                className={`w-full ${theme.button} py-4 text-xl transition-all relative overflow-hidden`}
+                className={`w-full ${theme.button} py-3 sm:py-4 text-xl transition-all relative overflow-hidden`}
                 style={{ fontFamily: theme.fontHeader }}
             >
-                <span className="relative z-10 flex items-center justify-center gap-4 uppercase tracking-widest">
-                    {buttonLabel}
-                </span>
+                <div className="relative z-10 flex flex-col items-center justify-center gap-1 uppercase tracking-widest">
+                    <span>{buttonLabel}</span>
+                    <span className="text-[10px] sm:text-xs opacity-60 font-sans font-bold tracking-[0.2em] border-t border-current/20 pt-1 w-1/2 mx-auto">
+                        Tap to Roll
+                    </span>
+                </div>
             </button>
         </div>
 

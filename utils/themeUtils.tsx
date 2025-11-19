@@ -1,5 +1,9 @@
 import React from 'react';
-import { Zap, Ghost, Flame, Smile, Skull, Anchor, Cog, Sun, AlertTriangle, Building2, Sparkles, PartyPopper, Frown } from 'lucide-react';
+import { 
+  Zap, Ghost, Flame, Smile, Skull, Anchor, Cog, Sun, AlertTriangle, 
+  Building2, Sparkles, PartyPopper, Frown, 
+  Gamepad2, Bug, Cpu, Bomb, Eye, Moon, Trash2, Wrench, Feather, Terminal, CircleDashed, Radiation
+} from 'lucide-react';
 import { ThemeConfig, ToneLabel } from '../types';
 import { D20Icon } from '../components/Icons';
 
@@ -67,27 +71,7 @@ export const getTheme = (currentSetting: string): ThemeConfig => {
         };
     }
 
-    // --- 4. STEAMPUNK ---
-    if (s.includes('steam')) {
-        return {
-          id: 'steampunk',
-          fontHeader: "'Press Start 2P', cursive",
-          fontBody: "'VT323', monospace",
-          bg: "bg-[#27272a]",
-          bgStyle: { backgroundImage: "radial-gradient(#431407 1px, transparent 1px)", backgroundSize: "20px 20px" },
-          container: "bg-[#292524] border-4 border-[#c2410c] shadow-[8px_8px_0_0_#431407]", // Orange-700 border
-          textMain: "text-[#fdba74]", // Orange-300
-          textMuted: "text-[#9a3412]",
-          input: "bg-[#0c0a09] border-2 border-[#c2410c] text-[#fdba74] placeholder-[#7c2d12] focus:border-[#fb923c]",
-          button: "bg-[#c2410c] hover:bg-[#ea580c] text-[#fff7ed] border-b-4 border-r-4 border-[#431407] active:border-0 active:translate-y-1",
-          accentColor: "text-[#fb923c]",
-          icon: <Cog className="w-6 h-6 text-[#fb923c] animate-[spin_4s_linear_infinite]" />,
-          animation: "",
-          thumbBorder: "bg-[#c2410c]"
-        };
-    }
-
-    // --- 5. WESTERN ---
+    // --- 4. WESTERN ---
     if (s.includes('western')) {
         return {
           id: 'western',
@@ -107,7 +91,7 @@ export const getTheme = (currentSetting: string): ThemeConfig => {
         };
     }
 
-    // --- 6. PIRATE / NAUTICAL ---
+    // --- 5. PIRATE / NAUTICAL ---
     if (s.includes('pirate') || s.includes('nautical')) {
         return {
           id: 'pirate',
@@ -128,7 +112,7 @@ export const getTheme = (currentSetting: string): ThemeConfig => {
         };
     }
 
-    // --- 7. MODERN / URBAN ---
+    // --- 6. MODERN / URBAN ---
     if (s.includes('modern') || s.includes('urban')) {
         return {
           id: 'modern',
@@ -148,7 +132,7 @@ export const getTheme = (currentSetting: string): ThemeConfig => {
         };
     }
 
-    // --- 8. HIGH FANTASY (Magical/Mystical) ---
+    // --- 7. HIGH FANTASY (Magical/Mystical) ---
     if (s.includes('high fantasy')) {
         return {
           id: 'high_fantasy',
@@ -171,7 +155,7 @@ export const getTheme = (currentSetting: string): ThemeConfig => {
         };
     }
 
-    // --- DEFAULT: TAVERN (FANTASY) ---
+    // --- DEFAULT: TAVERN (Fallback) ---
     return {
       id: 'tavern',
       fontHeader: "'Press Start 2P', cursive",
@@ -193,47 +177,122 @@ export const getTheme = (currentSetting: string): ThemeConfig => {
     };
 };
 
-export const getToneLabel = (val: number, theme: ThemeConfig): ToneLabel => {
-    const isDarkTheme = ['cyber', 'horror', 'wasteland', 'pirate', 'steampunk', 'high_fantasy'].includes(theme.id);
-    let colorClass = "";
+// Helper to calculate fluid color based on theme and value (0-100)
+const getChaosColor = (themeId: string, value: number): string => {
+    const p = value; // percentage 0-100
 
-    // --- Interval 1: 0-15 (Extreme Silly) ---
-    if (val <= 15) {
-        if (isDarkTheme) colorClass = "text-pink-400";
-        else colorClass = "text-pink-600";
-        return { label: "Pure Chaos", icon: <PartyPopper className="w-5 h-5" />, color: colorClass };
-    }
+    // Helper HSL string
+    const hsl = (h: number, s: number, l: number) => `hsl(${h}, ${s}%, ${l}%)`;
 
-    // --- Interval 2: 16-35 (Clumsy / Mild Silly) ---
-    if (val <= 35) {
-        if (isDarkTheme) colorClass = "text-yellow-400";
-        else colorClass = "text-yellow-600";
-        return { label: "Slapstick", icon: <Smile className="w-5 h-5" />, color: colorClass };
-    }
+    switch (themeId) {
+        case 'cyber':
+            // Cyan (180) -> Green (120) -> Yellow (60) -> Red (0) -> Pink (320)
+            // Simple spectrum shift: 180 down to -40 (which is 320)
+            // Let's do: Cyan -> Green -> Yellow -> Red
+            // 180 -> 0
+            const cyberHue = Math.max(0, 180 - (p * 1.8));
+            // At high levels, maybe shift to glitchy pink (300)
+            if (p > 90) return hsl(320, 100, 60);
+            return hsl(cyberHue, 100, 50);
 
-    // --- Interval 3: 36-65 (Standard / Adventure) ---
-    if (val <= 65) {
-        if (isDarkTheme) colorClass = "text-blue-400";
-        else colorClass = "text-blue-600";
-        // Special overrides for mono-themes
-        if (theme.id === 'modern') colorClass = "text-neutral-600";
-        if (theme.id === 'wasteland') colorClass = "text-[#d9f99d]";
+        case 'horror':
+            // Grey/Stone -> Deep Red -> Bright Crimson
+            // Saturation increases, Lightness drops then spikes
+            const hSat = p; 
+            // Lightness: 70 (grey) -> 30 (blood) -> 50 (bright red)
+            const hLight = p < 50 ? 70 - (p * 0.8) : 30 + ((p-50));
+            return hsl(0, hSat, hLight);
+            
+        case 'wasteland':
+            // Toxic Green (100) -> Yellow (60) -> Brown/Orange (30)
+            const wasteHue = Math.max(15, 100 - (p * 0.85));
+            return hsl(wasteHue, 100, p > 80 ? 40 : 50);
+            
+        case 'high_fantasy':
+            // Blue (240) -> Purple (270) -> Pink (300) -> Red (360/0)
+            const magicHue = 240 + (p * 1.2);
+            return hsl(magicHue % 360, 100, 70);
         
-        return { label: "Unfortunate", icon: <D20Icon className="w-5 h-5" />, color: colorClass };
-    }
+        case 'modern':
+             // Blue (200) -> Grey (Saturation Drop) -> Red
+             if (p < 50) return hsl(200, 80, 50);
+             return hsl(0, 80, 50);
+        
+        case 'western':
+            // Yellow (50) -> Orange (30) -> Red (10)
+            const westHue = 50 - (p * 0.4);
+            return hsl(westHue, 100, 40);
 
-    // --- Interval 4: 66-85 (Gritty / Painful) ---
-    if (val <= 85) {
-        if (isDarkTheme) colorClass = "text-orange-500";
-        else colorClass = "text-orange-700";
-        return { label: "Gritty", icon: <AlertTriangle className="w-5 h-5" />, color: colorClass };
+        case 'tavern':
+        default:
+            // Green (120) -> Yellow (60) -> Red (0)
+            // Classic RPG gradient
+            const classicHue = Math.max(0, 120 - (p * 1.2));
+            return hsl(classicHue, 90, 40);
     }
+};
 
-    // --- Interval 5: 86-100 (Extreme Lethal / Catastrophic) ---
-    if (isDarkTheme) colorClass = "text-red-500";
-    else colorClass = "text-red-700";
+export const getToneLabel = (val: number, theme: ThemeConfig): ToneLabel => {
+    const colorStyle = { color: getChaosColor(theme.id, val) };
+    const iconClass = "w-5 h-5";
     
-    return { label: "Catastrophic", icon: <Skull className="w-5 h-5" />, color: colorClass };
+    // Define Theme-Specific Icon Sets
+    // 0: Silly, 1: Clumsy, 2: Unfortunate, 3: Gritty, 4: Catastrophic
+
+    let icon: React.ReactNode = <D20Icon className={iconClass} />;
+    let label = "Unfortunate";
+
+    // --- TAVERN / FANTASY (Used by Default, Western, Pirate) ---
+    if (theme.id === 'tavern' || theme.id === 'western' || theme.id === 'pirate') {
+        if (val <= 15) { icon = <PartyPopper className={iconClass} />; label = "Pure Chaos"; }
+        else if (val <= 35) { icon = <Smile className={iconClass} />; label = "Slapstick"; }
+        else if (val <= 65) { icon = <D20Icon className={iconClass} />; label = "Unfortunate"; }
+        else if (val <= 85) { icon = <AlertTriangle className={iconClass} />; label = "Gritty"; }
+        else { icon = <Skull className={iconClass} />; label = "Catastrophic"; }
+    }
+    
+    // --- CYBER / SPACE ---
+    else if (theme.id === 'cyber' || theme.id === 'modern') {
+        if (val <= 15) { icon = <Gamepad2 className={iconClass} />; label = "Glitchy"; }
+        else if (val <= 35) { icon = <Bug className={iconClass} />; label = "Buggy"; }
+        else if (val <= 65) { icon = <Terminal className={iconClass} />; label = "Error"; }
+        else if (val <= 85) { icon = <Cpu className={iconClass} />; label = "Critical"; }
+        else { icon = <Bomb className={iconClass} />; label = "Fatal Error"; }
+    }
+
+    // --- HORROR ---
+    else if (theme.id === 'horror') {
+        if (val <= 15) { icon = <Ghost className={iconClass} />; label = "Unnerving"; }
+        else if (val <= 35) { icon = <Eye className={iconClass} />; label = "Creepy"; }
+        else if (val <= 65) { icon = <Moon className={iconClass} />; label = "Dark"; }
+        else if (val <= 85) { icon = <AlertTriangle className={iconClass} />; label = "Terrifying"; }
+        else { icon = <Skull className={iconClass} />; label = "Nightmare"; }
+    }
+
+    // --- WASTELAND ---
+    else if (theme.id === 'wasteland') {
+        if (val <= 15) { icon = <Trash2 className={iconClass} />; label = "Janky"; }
+        else if (val <= 35) { icon = <Bug className={iconClass} />; label = "Rusted"; }
+        else if (val <= 65) { icon = <CircleDashed className={iconClass} />; label = "Broken"; }
+        else if (val <= 85) { icon = <Radiation className={iconClass} />; label = "Radioactive"; }
+        else { icon = <Skull className={iconClass} />; label = "Deadly"; }
+    }
+
+    // --- HIGH FANTASY ---
+    else if (theme.id === 'high_fantasy') {
+        if (val <= 15) { icon = <Sparkles className={iconClass} />; label = "Whimsical"; }
+        else if (val <= 35) { icon = <Zap className={iconClass} />; label = "Volatile"; }
+        else if (val <= 65) { icon = <D20Icon className={iconClass} />; label = "Cursed"; }
+        else if (val <= 85) { icon = <Flame className={iconClass} />; label = "Destructive"; }
+        else { icon = <Skull className={iconClass} />; label = "Annihilation"; }
+    }
+
+    return { 
+        label, 
+        icon, 
+        color: "", // Deprecated in favor of style
+        style: colorStyle 
+    };
 };
 
 export const getFlavorIntro = (currentSetting: string): string => {
@@ -259,7 +318,7 @@ export const getFlavorIntro = (currentSetting: string): string => {
 
     // 2. Setting Specific Injections
     
-    // FANTASY / TAVERN
+    // FANTASY (High Fantasy, Generic Fantasy)
     if (s.includes('fantasy')) {
         flavors.push(
             "A sudden flare of torchlight blinds you and ",
@@ -296,17 +355,6 @@ export const getFlavorIntro = (currentSetting: string): string => {
             "The sun reflects blindly off the water and ",
             "A loose rope catches your ankle and ",
             "A parrot screeches in your ear and ",
-        );
-    }
-
-    // STEAMPUNK SPECIFIC
-    if (s.includes('steam')) {
-        flavors.push(
-            "A steam valve bursts nearby and ",
-            "Your goggles fog up instantly and ",
-            "The gears of your equipment jam momentarily and ",
-            "Soot gets in your eyes and ",
-            "A clockwork mechanism misfires and ",
         );
     }
 

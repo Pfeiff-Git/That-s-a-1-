@@ -1,9 +1,13 @@
 import { FumbleDefinition } from './types';
 
 export const campaignSettings = [
-  "High Fantasy", "Dark Fantasy", "Cyberpunk", "Sci-Fi / Space Opera", 
-  "Gothic Horror", "Post-Apocalyptic", "Steampunk", 
-  "Modern / Urban Fantasy", "Western", "Pirate / Nautical"
+  "High Fantasy", 
+  "Dark Fantasy / Horror", 
+  "Sci-Fi / Cyberpunk", 
+  "Post-Apocalyptic", 
+  "Modern / Urban", 
+  "Western", 
+  "Pirate / Nautical"
 ];
 
 export const gameSystems = [

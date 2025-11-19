@@ -35,5 +35,6 @@ export interface ThemeConfig {
 export interface ToneLabel {
   label: string;
   icon: ReactNode;
-  color: string;
+  color: string; // Kept for fallback or tailwind classes
+  style?: React.CSSProperties; // For dynamic fluid colors
 }
